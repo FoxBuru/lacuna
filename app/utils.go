@@ -54,7 +54,7 @@ func extractSubscriptions(container docker.Container) []pubsub.Subscription {
 		case "topic":
 			subscriptionMap[name].Topic = value
 		case "endpoint", "unwrap-message", "unwrap-enable-metadata":
-			setPushOptions(*subscriptionMap[name], keyParts[3], value)
+			setPushOptions(subscriptionMap[name], keyParts[3], value)
 		case "ack-deadline":
 			deadline, err := time.ParseDuration(value)
 			if err != nil {
@@ -140,7 +140,10 @@ func extractSubscriptions(container docker.Container) []pubsub.Subscription {
 	return subscriptions
 }
 
-func setPushOptions(subscription pubsub.Subscription, key, value string) {
+func setPushOptions(subscription *pubsub.Subscription, key, value string) {
+	if subscription == nil {
+		return
+	}
 	if key == "" || value == "" {
 		return
 	}
