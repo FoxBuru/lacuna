@@ -44,8 +44,8 @@ func TestExtractSubscriptionsExtractsValidSubscriptions(t *testing.T) {
 		t.Errorf("expected subscription topic to be 'test-topic', got '%s'", subscriptions[0].Topic)
 	}
 
-	if subscriptions[0].Endpoint != "/messages" {
-		t.Errorf("expected subscription endpoint to be '/messages', got '%s'", subscriptions[0].Endpoint)
+	if subscriptions[0].PushOptions != nil && subscriptions[0].PushOptions.Endpoint != "/messages" {
+		t.Errorf("expected subscription endpoint to be '/messages', got '%s'", subscriptions[0].PushOptions.Endpoint)
 	}
 }
 
@@ -65,6 +65,8 @@ func TestExtractSubscriptionsExtractsValidSubscriptionOptions(t *testing.T) {
 		"lacuna.subscription.test.max-dead-letter-delivery-attempts": "10",
 		"lacuna.subscription.test.retry-minimum-backoff":             "10s",
 		"lacuna.subscription.test.retry-maximum-backoff":             "10s",
+		"lacuna.subscription.test.unwrap-message":                    "true",
+		"lacuna.subscription.test.unwrap-enable-metadata":            "true",
 	})
 
 	// act
@@ -83,8 +85,8 @@ func TestExtractSubscriptionsExtractsValidSubscriptionOptions(t *testing.T) {
 		t.Errorf("expected topic to be 'test-topic', got '%s'", subscriptions[0].Topic)
 	}
 
-	if subscriptions[0].Endpoint != "/messages" {
-		t.Errorf("expected endpoint to be '/messages', got '%s'", subscriptions[0].Endpoint)
+	if subscriptions[0].PushOptions != nil && subscriptions[0].PushOptions.Endpoint != "/messages" {
+		t.Errorf("expected endpoint to be '/messages', got '%s'", subscriptions[0].PushOptions.Endpoint)
 	}
 
 	if subscriptions[0].AckDeadline != 10*time.Second {
@@ -129,6 +131,12 @@ func TestExtractSubscriptionsExtractsValidSubscriptionOptions(t *testing.T) {
 
 	if *subscriptions[0].RetryMaximumBackoff != 10*time.Second {
 		t.Errorf("expected retry-maximum-backoff to be 10s, got '%d'", subscriptions[0].RetryMaximumBackoff)
+	}
+	if subscriptions[0].PushOptions != nil && subscriptions[0].PushOptions.UnwrapMessage != true {
+		t.Errorf("expected unwrap-message to be true, got '%t'", subscriptions[0].PushOptions.UnwrapMessage)
+	}
+	if subscriptions[0].PushOptions != nil && subscriptions[0].PushOptions.UnwrapEnableMetadata != true {
+		t.Errorf("expected unwrap-enable-metadata to be true, got '%t'", subscriptions[0].PushOptions.UnwrapEnableMetadata)
 	}
 }
 

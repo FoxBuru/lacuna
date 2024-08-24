@@ -68,19 +68,21 @@ Lacuna is configured using docker labels. The following labels are supported:
 
 For each subscription, the following options can be set. For a detailed description of each option, see the [Pub/Sub API documentation](https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions).
 
-| Option                              | Description                                                        |
-| ----------------------------------- | ------------------------------------------------------------------ |
-| `ack-deadline`                      | The number of seconds the subscriber has to acknowledge a message. |
-| `retain-acked-messages`             | Whether to retain acknowledged messages.                           |
-| `retention-duration`                | The number of seconds to retain acknowledged messages.             |
-| `enable-ordering`                   | Whether to enable message ordering.                                |
-| `expiration-ttl`                    | The number of seconds a message can be retained.                   |
-| `filter`                            | A filter expression.                                               |
-| `deliver-exactly-once`              | Whether to deliver messages exactly once.                          |
-| `dead-letter-topic`                 | The name of the dead letter topic.                                 |
-| `max-dead-letter-delivery-attempts` | The maximum number of delivery attempts for a message.             |
-| `retry-minimum-backoff`             | The minimum backoff time for retrying a message.                   |
-| `retry-maximum-backoff`             | The maximum backoff time for retrying a message.                   |
+| Option                              | Description                                                                           |
+| ----------------------------------- | ------------------------------------------------------------------------------------- |
+| `ack-deadline`                      | The number of seconds the subscriber has to acknowledge a message.                    |
+| `retain-acked-messages`             | Whether to retain acknowledged messages.                                              |
+| `retention-duration`                | The number of seconds to retain acknowledged messages.                                |
+| `enable-ordering`                   | Whether to enable message ordering.                                                   |
+| `expiration-ttl`                    | The number of seconds a message can be retained.                                      |
+| `filter`                            | A filter expression.                                                                  |
+| `deliver-exactly-once`              | Whether to deliver messages exactly once.                                             |
+| `dead-letter-topic`                 | The name of the dead letter topic.                                                    |
+| `max-dead-letter-delivery-attempts` | The maximum number of delivery attempts for a message.                                |
+| `retry-minimum-backoff`             | The minimum backoff time for retrying a message.                                      |
+| `retry-maximum-backoff`             | The maximum backoff time for retrying a message.                                      |
+| `unwrap-message`                    | Whether the message should be unwrapped before being sent to the subscriber endpoint. |
+| `unwrap-enable-metadata`            | Whether the message attributes should be sent as headers to the subscriber endpoint.  |
 
 ## Acknowledgements
 

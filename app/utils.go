@@ -53,8 +53,8 @@ func extractSubscriptions(container docker.Container) []pubsub.Subscription {
 		switch keyParts[3] {
 		case "topic":
 			subscriptionMap[name].Topic = value
-		case "endpoint":
-			subscriptionMap[name].Endpoint = value
+		case "endpoint", "unwrap-message", "unwrap-enable-metadata":
+			setPushOptions(subscriptionMap[name], keyParts[3], value)
 		case "ack-deadline":
 			deadline, err := time.ParseDuration(value)
 			if err != nil {
@@ -129,7 +129,7 @@ func extractSubscriptions(container docker.Container) []pubsub.Subscription {
 
 	// Convert map to slice, only consider valid subscriptions
 	for _, subscription := range subscriptionMap {
-		if subscription.Topic != "" && subscription.Endpoint != "" {
+		if subscription.Topic != "" && subscription.PushOptions != nil {
 			// Only include subscriptions with both topic and endpoint populated
 			subscriptions = append(subscriptions, *subscription)
 		} else {
@@ -138,4 +138,27 @@ func extractSubscriptions(container docker.Container) []pubsub.Subscription {
 	}
 
 	return subscriptions
+}
+
+func setPushOptions(subscription *pubsub.Subscription, key, value string) {
+	if subscription == nil {
+		return
+	}
+	if key == "" || value == "" {
+		return
+	}
+	if subscription.PushOptions == nil {
+		subscription.PushOptions = &pubsub.PushOptions{}
+	}
+
+	switch key {
+	case "endpoint":
+		subscription.PushOptions.Endpoint = value
+	case "unwrap-message":
+		parsedVal, _ := strconv.ParseBool(value)
+		subscription.PushOptions.UnwrapMessage = parsedVal
+	case "unwrap-enable-metadata":
+		parsedVal, _ := strconv.ParseBool(value)
+		subscription.PushOptions.UnwrapEnableMetadata = parsedVal
+	}
 }
