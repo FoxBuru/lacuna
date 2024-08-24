@@ -9,7 +9,7 @@ type Subscription struct {
 	Service                       string
 	Name                          string
 	Topic                         string
-	Endpoint                      string
+	PushOptions                   *PushOptions
 	AckDeadline                   time.Duration
 	RetainAckedMessages           bool
 	RetentionDuration             time.Duration
@@ -21,6 +21,12 @@ type Subscription struct {
 	MaxDeadLetterDeliveryAttempts int
 	RetryMinimumBackoff           *time.Duration
 	RetryMaximumBackoff           *time.Duration
+}
+
+type PushOptions struct {
+	Endpoint             string
+	UnwrapMessage        bool
+	UnwrapEnableMetadata bool
 }
 
 func (s *Subscription) GetSubscriptionID() string {

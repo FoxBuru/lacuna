@@ -63,7 +63,8 @@ func (ps *pubSubImpl) ensureTopic(ctx context.Context, topicName string) (*gcps.
 }
 
 func (ps *pubSubImpl) CreateSubscription(ctx context.Context, subscription Subscription) error {
-	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic).WithField("endpoint", subscription.Endpoint)
+	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic)
+	logWithSubscriptionPushOptions(log, subscription)
 
 	topic, err := ps.ensureTopic(ctx, subscription.Topic)
 
@@ -93,7 +94,8 @@ func (ps *pubSubImpl) CreateSubscription(ctx context.Context, subscription Subsc
 }
 
 func (ps *pubSubImpl) createSubscription(ctx context.Context, topic *gcps.Topic, subscription Subscription) error {
-	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic).WithField("endpoint", subscription.Endpoint)
+	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic)
+	logWithSubscriptionPushOptions(log, subscription)
 
 	_, err := ps.client.CreateSubscription(ctx, subscription.GetSubscriptionID(), createSubscriptionConfig(topic, subscription))
 
@@ -123,7 +125,8 @@ func (ps *pubSubImpl) createSubscription(ctx context.Context, topic *gcps.Topic,
 // }
 
 func (ps *pubSubImpl) DeleteSubscription(ctx context.Context, subscription Subscription) error {
-	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic).WithField("endpoint", subscription.Endpoint)
+	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic)
+	logWithSubscriptionPushOptions(log, subscription)
 
 	sub := ps.client.Subscription(subscription.GetSubscriptionID())
 
@@ -169,11 +172,8 @@ func createSubscriptionConfig(topic *gcps.Topic, subscription Subscription) gcps
 		retryPolicy.MaximumBackoff = *subscription.RetryMaximumBackoff
 	}
 
-	return gcps.SubscriptionConfig{
-		Topic: topic,
-		PushConfig: gcps.PushConfig{
-			Endpoint: subscription.Endpoint,
-		},
+	subConfig := gcps.SubscriptionConfig{
+		Topic:                     topic,
 		AckDeadline:               subscription.AckDeadline,
 		RetainAckedMessages:       subscription.RetainAckedMessages,
 		RetentionDuration:         subscription.RetentionDuration,
@@ -184,6 +184,40 @@ func createSubscriptionConfig(topic *gcps.Topic, subscription Subscription) gcps
 		DeadLetterPolicy:          deadLetterPolicy,
 		RetryPolicy:               retryPolicy,
 	}
+
+	fillSubscriptionPushOptions(&subConfig, subscription)
+
+	return subConfig
+}
+
+func fillSubscriptionPushOptions(subConfig *gcps.SubscriptionConfig, subscription Subscription) {
+	if subscription.PushOptions == nil {
+		return
+	}
+	subConfig.PushConfig = gcps.PushConfig{
+		Endpoint: subscription.PushOptions.Endpoint,
+	}
+
+	if subscription.PushOptions.UnwrapMessage {
+		subConfig.PushConfig.Wrapper = &gcps.NoWrapper{
+			WriteMetadata: subscription.PushOptions.UnwrapEnableMetadata,
+		}
+	}
+}
+
+func logWithSubscriptionPushOptions(log *log.Entry, subscription Subscription) *log.Entry {
+	if subscription.PushOptions == nil {
+		return log
+	}
+	entry := log.WithField("endpoint", subscription.PushOptions.Endpoint)
+	if subscription.PushOptions.UnwrapMessage {
+		entry = entry.WithField("unwrap_message", true)
+	}
+	if subscription.PushOptions.UnwrapEnableMetadata {
+		entry = entry.WithField("unwrap_enable_metadata", true)
+	}
+
+	return entry
 }
 
 // func updateSubscriptionConfig(subscription Subscription) gcps.SubscriptionConfigToUpdate {

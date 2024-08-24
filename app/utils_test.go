@@ -44,8 +44,8 @@ func TestExtractSubscriptionsExtractsValidSubscriptions(t *testing.T) {
 		t.Errorf("expected subscription topic to be 'test-topic', got '%s'", subscriptions[0].Topic)
 	}
 
-	if subscriptions[0].Endpoint != "/messages" {
-		t.Errorf("expected subscription endpoint to be '/messages', got '%s'", subscriptions[0].Endpoint)
+	if subscriptions[0].PushOptions != nil && subscriptions[0].PushOptions.Endpoint != "/messages" {
+		t.Errorf("expected subscription endpoint to be '/messages', got '%s'", subscriptions[0].PushOptions.Endpoint)
 	}
 }
 
@@ -83,8 +83,8 @@ func TestExtractSubscriptionsExtractsValidSubscriptionOptions(t *testing.T) {
 		t.Errorf("expected topic to be 'test-topic', got '%s'", subscriptions[0].Topic)
 	}
 
-	if subscriptions[0].Endpoint != "/messages" {
-		t.Errorf("expected endpoint to be '/messages', got '%s'", subscriptions[0].Endpoint)
+	if subscriptions[0].PushOptions != nil && subscriptions[0].PushOptions.Endpoint != "/messages" {
+		t.Errorf("expected endpoint to be '/messages', got '%s'", subscriptions[0].PushOptions.Endpoint)
 	}
 
 	if subscriptions[0].AckDeadline != 10*time.Second {
