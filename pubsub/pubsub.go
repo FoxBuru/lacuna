@@ -64,7 +64,7 @@ func (ps *pubSubImpl) ensureTopic(ctx context.Context, topicName string) (*gcps.
 
 func (ps *pubSubImpl) CreateSubscription(ctx context.Context, subscription Subscription) error {
 	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic)
-	logWithSubscriptionPushOptions(log, subscription)
+	log = logWithSubscriptionPushOptions(log, subscription)
 
 	topic, err := ps.ensureTopic(ctx, subscription.Topic)
 
@@ -95,7 +95,7 @@ func (ps *pubSubImpl) CreateSubscription(ctx context.Context, subscription Subsc
 
 func (ps *pubSubImpl) createSubscription(ctx context.Context, topic *gcps.Topic, subscription Subscription) error {
 	log := ps.log.WithField("subscription_id", subscription.GetSubscriptionID()).WithField("topic", subscription.Topic)
-	logWithSubscriptionPushOptions(log, subscription)
+	log = logWithSubscriptionPushOptions(log, subscription)
 
 	_, err := ps.client.CreateSubscription(ctx, subscription.GetSubscriptionID(), createSubscriptionConfig(topic, subscription))
 
